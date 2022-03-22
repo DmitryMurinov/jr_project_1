@@ -218,7 +218,7 @@ public class ParametersHandler {
         System.out.println("Please, bear in mind, that duplicate parameters not allowed.");
         System.out.println("Cryptographer have a limited set of options. Follow guideline, please.");
         System.out.println("In any mode input file will be overridden with output data. It may be wise to make backup.");
-        System.out.println("Also only UTF-8 encoding, english and russian languages supported at the moment.");
+        System.out.println("Also only UTF-8 encoding, English and Russian languages supported at the moment.");
         System.out.println("--help >> prints only this help.");
         System.out.println("--path=<value> >> absolute path to file, if have whitespace, use double quotes.");
         System.out.println("--mode=<value> >> accepts only one of encode|decode|crack.");
