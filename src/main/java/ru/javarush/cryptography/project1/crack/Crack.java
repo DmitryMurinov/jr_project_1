@@ -57,7 +57,15 @@ public class Crack {
 
             LinkedHashMap<Character, BigDecimal> sampleStatistics = countStatistics(sampleData);
 
-            HashMap<Character, Character> dictionary = makeDictionaryBasedOnStatistics(dataStatistics, sampleStatistics);
+            HashMap<Character, Character> actualToMostProbable = makeDictionaryBasedOnStatistics(dataStatistics, sampleStatistics);
+
+            for (int i = 0; i < data.length; i++) {
+                char currentChar = data[i];
+
+                if(actualToMostProbable.containsKey(currentChar)){
+                    data[i] = actualToMostProbable.get(currentChar);
+                }
+            }
 
             Files.writeString(path, String.valueOf(data));
 
@@ -73,9 +81,7 @@ public class Crack {
         HashMap<Character, Character> out = new HashMap<>();
         for (Map.Entry<Character, BigDecimal> entry : dataStatistics.entrySet()){
             char mostProbable = findClosest(sampleStatistics, entry.getValue());
-
-
-
+            out.put(entry.getKey(), mostProbable);
         }
 
         return out;
@@ -84,37 +90,42 @@ public class Crack {
 
     private char findClosest(LinkedHashMap<Character, BigDecimal> sampleStatistics, BigDecimal value) {
         char out = sampleStatistics.entrySet().stream().findFirst().get().getKey();
-        BigDecimal minDelta = sampleStatistics.entrySet().stream().findFirst().get().getValue();
+        BigDecimal minDelta = sampleStatistics.entrySet().stream().findFirst().get().getValue()
+                .subtract(value).abs();
 
         for(Map.Entry<Character, BigDecimal> entry : sampleStatistics.entrySet()){
-
-
-
-
+            BigDecimal delta = entry.getValue().subtract(value).abs();
+            if(delta.compareTo(minDelta) < 0){
+                minDelta = delta;
+                out = entry.getKey();
+            }
         }
 
         return out;
     }
 
     private LinkedHashMap<Character, BigDecimal> countStatistics(char[] sampleData) {
-        Map<Character, Long> count = new HashMap<>();
+        Map<Character, Long> charOccurrence = new HashMap<>();
         for (int i = 0; i < sampleData.length; i++) {
-            if(count.containsKey(sampleData[i])){
-                count.put(sampleData[i], count.get(sampleData[i]) + 1L);
+            char sampleChar = sampleData[i];
+
+            if(charOccurrence.containsKey(sampleChar)){
+                charOccurrence.put(sampleChar, charOccurrence.get(sampleChar) + 1L);
             } else {
-                count.put(sampleData[i], 1L);
+                charOccurrence.put(sampleChar, 1L);
             }
         }
 
         LinkedHashMap<Character, BigDecimal> out = new LinkedHashMap<>();
 
-        for (Map.Entry<Character, Long> entry : count.entrySet()){
+        for (Map.Entry<Character, Long> entry : charOccurrence.entrySet()){
             out.put(entry.getKey(), new BigDecimal(entry.getValue()).setScale(1000, RoundingMode.HALF_EVEN)
                     .divide(new BigDecimal(sampleData.length), RoundingMode.HALF_EVEN));
         }
 
         out = out.entrySet().stream().sorted(Map.Entry.comparingByValue())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entry1, entry2) -> entry1, LinkedHashMap::new));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (entry1, entry2) -> entry1, LinkedHashMap::new));
 
         return out;
     }
@@ -165,8 +176,10 @@ public class Crack {
             HashMap<Character, Character> mapping = alphabet.getMapping();
 
             for (int i = 0; i < data.length; i++) {
-                if(mapping.containsKey(data[i])) {
-                    data[i] = mapping.get(data[i]);
+                char currentChar = data[i];
+
+                if(mapping.containsKey(currentChar)) {
+                    data[i] = mapping.get(currentChar);
                 }
             }
 
@@ -184,11 +197,14 @@ public class Crack {
 
         for (int i = 0; i < data.length; i++) {
             int index = i + offset < data.length ? i + offset : i + offset - data.length;
-            if(!mapping.containsKey(data[index])){
+
+            char probableChar = data[index];
+
+            if(!mapping.containsKey(probableChar)){
                 continue;
             }
 
-            char currentChar = mapping.get(data[index]);
+            char currentChar = mapping.get(probableChar);
 
             char nextChar;
             if(index + 1 < data.length){
