@@ -1,4 +1,6 @@
-package ru.javarush.cryptography.project1;
+package ru.javarush.cryptography.project1.crack;
+
+import ru.javarush.cryptography.project1.data.Alphabet;
 
 import java.io.IOException;
 import java.math.BigDecimal;

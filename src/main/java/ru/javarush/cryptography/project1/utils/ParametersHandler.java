@@ -1,4 +1,4 @@
-package ru.javarush.cryptography.project1;
+package ru.javarush.cryptography.project1.utils;
 
 import java.io.File;
 import java.util.ArrayList;

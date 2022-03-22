@@ -1,4 +1,4 @@
-package ru.javarush.cryptography.project1;
+package ru.javarush.cryptography.project1.data;
 
 import java.util.Arrays;
 import java.util.HashMap;
